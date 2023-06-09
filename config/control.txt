@@ -1,0 +1,12 @@
+num_particles 10
+num_timesteps 100
+max_time 10
+num_asteroids 2
+ast_m_file a_m_1
+ast_rad_file a_r_1
+ast_pos_file a_p_1
+ast_vel_file a_v_1 
+dt 0.15
+particle_radius 0.3
+out_dir cmake-test
+write_mod 10
