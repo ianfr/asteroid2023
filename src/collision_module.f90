@@ -55,70 +55,21 @@ end subroutine fast_forward
 
 ! if any particles are overlapping / very close, calculate the collision between them
 ! MODIFIES particle_list
-subroutine bbox_collisions(particle_list, collision_matrix)
+subroutine bbox_collisions(particle_list, separation_buffer)
     type(particle), dimension(:), intent(inout) :: particle_list
-    type(logical), dimension(:,:), intent(inout) :: collision_matrix
-    integer :: i,j, n, k
-    real :: sep_buf, the_norm
-    !logical, dimension(:,:), allocatable :: coll_list
-    !real, dimension(3) :: pl_i_pos, pl_j_pos, tmp_pos
-
-    sep_buf = 0.05 * particle_list(1)%radius
+    real, intent(in) :: separation_buffer
+    integer :: i, j
 
     do i = 1, size(particle_list), 1
         do j = 1, size(particle_list), 1
             if (i .ne. j) then
                  if (norm2(particle_list(i)%pos - particle_list(j)%pos) <= &
-                        particle_list(i)%radius + particle_list(j)%radius + sep_buf) then
+                        particle_list(i)%radius + particle_list(j)%radius + separation_buffer) then
                     call collide(particle_list(i), particle_list(j))
                  end if
             end if
         end do
     end do
-
-    ! break up the computation into an embarassingly parallel part and a serial part
-    ! and avoid memory reallocation by passing in and modifying collision_matrix each time
-
-    ! we only use the upper half of collision_matrix
-    ! emabrassingly parallel
-
-    ! n = size(particle_list)
-    
-    ! !$acc parallel loop independent copyin(collision_matrix(n,n), particle_list(1:n)) copyout(collision_matrix(n,n), particle_list(1:n))
-    ! do i = 1, n, 1
-    !     !$acc loop private(pl_i_pos, pl_j_pos, tmp_pos, the_norm, k)
-    !     do j = 1, i, 1
-    !         pl_i_pos = particle_list(i)%pos
-    !         pl_j_pos = particle_list(j)%pos
-    !         ! if (my_norm2(pl_i_pos - pl_j_pos) <= &
-    !         !     particle_list(i)%radius + particle_list(j)%radius + sep_buf) then
-    !         !     collision_matrix(i,j) = .true.
-    !         ! end if
-    !         ! collision_matrix(i,j) = my_norm2(pl_i_pos - pl_j_pos) <= &
-    !         !     particle_list(i)%radius + particle_list(j)%radius + sep_buf
-    !         tmp_pos = pl_i_pos - pl_j_pos
-    !         the_norm = 0
-    !         do k = 1, 3, 1
-    !             the_norm = the_norm + tmp_pos(i)*tmp_pos(i)
-    !         end do
-    !         the_norm = sqrt(the_norm)
-    !         collision_matrix(i,j) = the_norm <= &
-    !              particle_list(i)%radius + particle_list(j)%radius + sep_buf
-    !     end do
-    ! end do
-    ! !$acc end parallel
-
-
-    ! ! serial 
-    ! do i = 1, n, 1
-    !     do j = 1, i, 1
-    !         if ((i .ne. j) .and. collision_matrix(i,j)) then
-    !             call collide(particle_list(i), particle_list(j))
-    !         end if
-    !     end do
-    ! end do
-
-    ! collision_matrix = .false.
 
 end subroutine bbox_collisions
 

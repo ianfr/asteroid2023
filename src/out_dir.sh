@@ -7,7 +7,7 @@ cd ../OUT
 
 if [ -d $1 ] 
 then
-    echo "Directory exists." 
+    echo "Creating new indexed output directory." 
 
     currName=$1
     i="0"

@@ -13,26 +13,10 @@ subroutine calculate_forces(particle_list, force_list)
     ! Internal variables for gravity
     integer :: i, j, n
     real :: Gmm
-    real, dimension(3) :: temp_force
     real, dimension(3) :: r_vector, r_unit_vector, tmp_vector
 
     allocate( force_list(3,size(particle_list)) )
     force_list = 0
-
-    ! calculate the total force on each particle
-    ! for gravity
-    ! do i = 1, size(particle_list), 1
-    !     temp_force = 0
-    !     do j = 1, size(particle_list), 1
-    !         if (i .ne. j) then
-    !             Gmm = BIG_G * particle_list(i)%mass  * particle_list(j)%mass
-    !             r_vector = particle_list(i)%pos - particle_list(j)%pos
-    !             r_unit_vector = r_vector / norm2(r_vector)
-    !             temp_force = temp_force - 1.0 * (Gmm * r_unit_vector) / norm2(r_vector)**2 
-    !         end if
-    !     end do
-    !     force_list(:,i) = temp_force
-    ! end do
 
     n = size(particle_list)
     do i = 1, n, 1
@@ -44,7 +28,6 @@ subroutine calculate_forces(particle_list, force_list)
                 tmp_vector = my_norm2(r_vector)**2
                 
                 force_list(:,i) = force_list(:,i) - 1.0 * (Gmm * r_unit_vector) / tmp_vector
-                
             end if
         end do
     end do
