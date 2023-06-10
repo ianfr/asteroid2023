@@ -16,7 +16,7 @@ Forces:
 
 Integration options:
 - Euler (order 1)
-- Verlet (order 2, **symplectic**) [`WIP`]
+- Velocity Verlet (order 2, **symplectic**)
 - Runge-Kutta (order 4)
 
 Collision schemes:

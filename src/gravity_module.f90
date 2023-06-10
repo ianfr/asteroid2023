@@ -59,6 +59,49 @@ subroutine gravity_update_euler(particle_list, timestep)
 
 end subroutine gravity_update_euler
 
+! 2nd-order symplectic integration for gravity; position update
+subroutine gravity_update_verlet_pos(particle_list, timestep, prev_for)
+    ! Input variables
+    type(particle), dimension(:), intent(inout) :: particle_list
+    real, intent(in) :: timestep
+    real, dimension(:,:), allocatable, intent(inout) :: prev_for ! previous forces for velocity update
+
+    ! Internal variables
+    integer :: i
+
+    ! Subroutine
+    call calculate_forces(particle_list, prev_for) ! Calculate the forces and store in force_list
+
+    ! apply each calculated force to each particle for the Verlet step
+    do i = 1, size(particle_list), 1
+        ! prev_pos(:,i) = particle_list(i)%pos ! copy for velocity step
+        particle_list(i)%pos = particle_list(i)%pos + particle_list(i)%vel * timestep + & 
+            (prev_for(:,i) / (2*particle_list(i)%mass)) * (timestep * timestep)
+    end do
+
+end subroutine gravity_update_verlet_pos
+
+! 2nd-order symplectic integration for gravity; velocity update
+subroutine gravity_update_verlet_vel(particle_list, timestep, prev_for)
+    ! Input variables
+    type(particle), dimension(:), intent(inout) :: particle_list
+    real, intent(in) :: timestep
+    real, dimension(:,:), intent(in) :: prev_for ! previous forces
+
+    ! Internal variables
+    integer :: i
+    real, dimension(:,:), allocatable :: force_list
+
+    ! Subroutine
+    call calculate_forces(particle_list, force_list) ! Calculate the forces and store in force_list
+
+    ! apply each calculated force to each particle for the Verlet step
+    do i = 1, size(particle_list), 1
+        particle_list(i)%vel = particle_list(i)%vel + &
+            ((force_list(:,i) + prev_for(:,i)) / (2*particle_list(i)%mass)) * timestep 
+    end do
+end subroutine gravity_update_verlet_vel
+
 subroutine gravity_update_rk4(particle_list, timestep)
     ! Input variables
     type(particle), dimension(:), intent(inout) :: particle_list
