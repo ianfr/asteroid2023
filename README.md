@@ -21,7 +21,7 @@ Integration options:
 
 Collision schemes:
 - Complete brute force (_O(n^2)_ time complexity)
-- Radially constrained brute force with probablistic complete brute force (_O(n*R^3 + eps*n^2)_) [`WIP`]
+- Radially constrained brute force with probablistic complete brute force (mostly _O(n)_, sometimes _O(n^2)_) [`WIP`]
 
 Adaptive time-stepping based on:
 - Maximum particle velocity
