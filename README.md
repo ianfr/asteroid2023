@@ -9,7 +9,20 @@
 - [x] Perform collision detection
 - [ ] Implement cohesion
 - [ ] Parallelize for CPU
-- [ ] Parallelize for GPU
+
+## Simulation Details:
+Forces:
+- Gravity
+Integration options:
+- Euler (order 1)
+- Verlet (order 2, **symplectic**) [`WIP`]
+- Runge-Kutta (order 4)
+Collision schemes:
+- Complete brute force (_O(n^2)_ time complexity)
+- Radially constrained brute force with probablistic complete brute force (_O(n*R^3 + eps*n^2)_) [`WIP`]
+Adaptive time-stepping based on:
+- Maximum particle velocity
+- Mean particle velocity [`WIP`] 
 
 ## Building & Running
 This project uses the CMake build system. To build and run, execute the following commands:
@@ -20,14 +33,12 @@ This project uses the CMake build system. To build and run, execute the followin
 * `./prog` to run the program.
 
 ## Configuration
-The first step for configuring a run is to set high-level parameters in *config/control.txt* (like the timestep size & number of asteroids).
-
-Some fields in *control.txt* point the program to input files for the mass, radius, position, and velocity of the asteroids in consideration. These input files are assumed to have 5-character names and are currently a_m_1, a_r_1, a_p_1, and a_v_1.
+The first step for configuring a run is to set high-level parameters in the main file *main_prog.f90* (like the timestep size & number of asteroids).
 
 Additionally, the output directory set in *control.txt* must exist before the program runs. Assuming you're already in the project directory, the command would be `mkdir OUT/X` where `X` is the value of the output directory field in *control.txt*.
 
 ## Viewing the results
-A Python script is included to facilitate viewing results when Paraview cannot load too many files at one time, but Paraview is the preferred method.
+A Python script is included to facilitate viewing results when Paraview cannot load too many files at one time, but **Paraview is the preferred method**.
 
 Paraview allows for opening "grouped" CSV files in numerical filename order, which is what the program outputs. In Paraview:
 * Open the CSV group 'ast.*' in the relevant output directory
@@ -40,4 +51,4 @@ Paraview allows for opening "grouped" CSV files in numerical filename order, whi
 
 To view a frame-by-frame animation, just click the play button at the top!
 
-**Copyright Ian Friedrichs 2022. All rights reserved.**
+**Repository copyright Ian Friedrichs 2023. All rights reserved.**
