@@ -12,20 +12,20 @@
 
 ## Simulation Details:
 Forces:
-- Gravity
+- Gravity [Brute force, _O(n^2)_ time complexity]
+- Gravity [Radially constrained brute force with probablistic full brute force (mostly _O(n)_, sometimes _O(n^2)_) [`WIP`]]
 
 Integration options:
 - Euler (order 1)
 - Velocity Verlet (order 2, **symplectic**)
 - Runge-Kutta (order 4)
 
-Collision schemes:
-- Complete brute force (_O(n^2)_ time complexity)
-- Radially constrained brute force with probablistic complete brute force (mostly _O(n)_, sometimes _O(n^2)_) [`WIP`]
+Collision detection schemes:
+- Filter collision calculation calls based on relative positions (_O(n^2)_ time complexity)
 
 Adaptive time-stepping based on:
 - Maximum particle velocity
-- Mean particle velocity [`WIP`] 
+- Mean particle velocity and radius 
 
 ## Building & Running
 This project uses the CMake build system. To build and run, execute the following commands:

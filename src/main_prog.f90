@@ -16,8 +16,9 @@ program main_prog
 
     ! Program parameters
     real, parameter :: DT  = 0.15 ! DT is an upper bound for timesteps
+    real, parameter :: DT_LOWER_B = 1e-5 ! absolute lower bound for the adaptive timestep
     character(len=*), parameter :: PARAM_FILE_NAME = "../config/control.txt"
-    character(len=*), parameter :: OUT_DIR = "test-verlet"
+    character(len=*), parameter :: OUT_DIR = "test-atx-mean"
     integer, parameter :: MAX_NUM_TSTEPS = 100
     integer, parameter :: WRITE_MOD = 10
     real, parameter :: MAX_TIME = 3
@@ -28,6 +29,10 @@ program main_prog
     logical, parameter :: USE_EULER = .false.
     logical, parameter :: USE_VERLET = .true.
     logical, parameter :: USE_RK4 = .false.
+
+    ! Pick an adaptive timestepping scheme
+    logical, parameter :: USE_ATS_MAX = .false. ! use maximum particle velocity, assume uniform radius
+    logical, parameter :: USE_ATS_MEAN = .true. ! use mean particle velocity and radius
 
     ! PROGRAM START
     print*, "SIMULATION OF RUBBLE-PILE ASTEROID COLLISION AND FORMATION WITH:"
@@ -66,9 +71,16 @@ program main_prog
     file_counter = 1 ! for making filenames
 
     ! Adaptive timestep
-    eff_dt = calculate_next_dt(particle_list)
+    if (USE_ATS_MAX) then
+      eff_dt = calculate_next_dt_max(particle_list)
+    else ! USE_ATX_MEAN
+      eff_dt = calculate_next_dt_mean(particle_list)
+    end if
     if (eff_dt .gt. DT) then
       eff_dt = DT
+    end if
+    if (eff_dt .lt. DT_LOWER_B) then
+      eff_dt = DT_LOWER_B
     end if
 
     do while (total_time < MAX_NUM_TSTEPS * DT .and. total_time < MAX_TIME)
@@ -101,9 +113,16 @@ program main_prog
       end do
 
       ! Adaptive timestep
-      eff_dt = calculate_next_dt(particle_list)
+      if (USE_ATS_MAX) then
+        eff_dt = calculate_next_dt_max(particle_list)
+      else ! USE_ATX_MEAN
+        eff_dt = calculate_next_dt_mean(particle_list)
+      end if
       if (eff_dt .gt. DT) then
         eff_dt = DT
+      end if
+      if (eff_dt .lt. DT_LOWER_B) then
+        eff_dt = DT_LOWER_B
       end if
     end do
 end program main_prog

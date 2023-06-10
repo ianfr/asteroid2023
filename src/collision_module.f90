@@ -75,7 +75,7 @@ end subroutine bbox_collisions
 
 ! calculate a new timestep s.t.: (v_max + v_second_max) * new_dt < 2*particle_radius
 ! ASSUMES uniform radii, but it's also just a heuristic so not a huge deal, could also precompute average radius size
-real function calculate_next_dt(particle_list) result(new_dt)
+real function calculate_next_dt_max(particle_list) result(new_dt)
     type(particle), dimension(:), intent(in) :: particle_list
 
     integer :: i
@@ -92,6 +92,27 @@ real function calculate_next_dt(particle_list) result(new_dt)
     v_second_max = maxval(v_list, mask = v_list .le. v_max)
 
     new_dt = (2.0 * particle_list(1)%radius) / ((v_max + v_second_max))
+
+end function
+
+! calculate a new timestep s.t.: v_mean * new_dt < mean_particle_radius
+real function calculate_next_dt_mean(particle_list) result(new_dt)
+    type(particle), dimension(:), intent(in) :: particle_list
+
+    integer :: i
+    real :: v_mean
+    real :: radius_mean
+
+    ! Avoiding sum()/size() to prevent overflows
+    v_mean = 0
+    radius_mean = 0
+    do i = 1, size(particle_list), 1
+        v_mean = v_mean + (norm2(particle_list(i)%vel) / size(particle_list))
+        radius_mean = radius_mean + (particle_list(i)%radius / size(particle_list))
+    end do
+
+    ! subtract a small amount to keep the inequality true
+    new_dt = (radius_mean / v_mean) - 1e-9
 
 end function
 
