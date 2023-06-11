@@ -20,10 +20,10 @@ program main_prog
     ! Program parameters
     real, parameter :: DT  = 0.15 ! DT is an upper bound for timesteps
     real, parameter :: DT_LOWER_B = 1e-5 ! absolute lower bound for the adaptive timestep
-    character(len=*), parameter :: OUT_DIR = "new-fcs-rp"
-    integer, parameter :: MAX_NUM_TSTEPS = 3
-    integer, parameter :: WRITE_MOD = 1
-    real, parameter :: MAX_TIME = 100
+    character(len=*), parameter :: OUT_DIR = "desktop"
+    integer, parameter :: MAX_NUM_TSTEPS = 10000
+    integer, parameter :: WRITE_MOD = 1000
+    real, parameter :: MAX_TIME = 1000000
     real, parameter :: COLLISION_RANGE = 0.05 ! check with particle radii below to see if appropriate
     integer, parameter :: BBOX_COLL_ITER = 2 ! iterations for collision checking/handling
 
@@ -65,7 +65,7 @@ program main_prog
     print*, "[main_prog] adding asteroids..."
 
     call add_asteroid_ellipsoid(particle_list, 78e9, 280.0, 250.0, 250.0, 11.7, [0.0,0.0,0.0], [0.0,0.0,0.0], 10000, 0)
-    call add_asteroid_ellipsoid(particle_list, 78e9, 280.0, 250.0, 250.0, 11.7, [700.0,0.0,0.0], [-10.0,0.0,0.0], 10000, 1)
+    call add_asteroid_ellipsoid(particle_list, 78e9, 100.0, 100.0, 100.0, 10.0, [550.0,0.0,0.0], [-10.0,0.0,0.0], 10000, 1)
 
     print*, "[main_prog] DONE adding asteroids."
     print*, "number of particles: ", size(particle_list)
