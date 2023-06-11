@@ -27,3 +27,5 @@ then
 else
     mkdir $1
 fi
+
+cp ../src/main_prog.f90 $1

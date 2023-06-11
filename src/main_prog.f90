@@ -6,6 +6,7 @@ program main_prog
     use utilities_module
     use gravity_module
     use collision_module
+    use timers_module
 
     ! VARIABLES
     implicit none
@@ -13,15 +14,15 @@ program main_prog
     real :: total_time, eff_dt
     type(particle), allocatable :: particle_list(:)
     real, dimension(:,:), allocatable :: prev_for ! prev. forces for verlet update
+    type(Timer) :: chrono
 
     ! Program parameters
     real, parameter :: DT  = 0.15 ! DT is an upper bound for timesteps
     real, parameter :: DT_LOWER_B = 1e-5 ! absolute lower bound for the adaptive timestep
-    character(len=*), parameter :: PARAM_FILE_NAME = "../config/control.txt"
-    character(len=*), parameter :: OUT_DIR = "test-atx-mean"
-    integer, parameter :: MAX_NUM_TSTEPS = 100
+    character(len=*), parameter :: OUT_DIR = "timing"
+    integer, parameter :: MAX_NUM_TSTEPS = 3
     integer, parameter :: WRITE_MOD = 10
-    real, parameter :: MAX_TIME = 3
+    real, parameter :: MAX_TIME = 100
     real, parameter :: COLLISION_RANGE = 0.05 ! check with particle radii below to see if appropriate
     integer, parameter :: BBOX_COLL_ITER = 2 ! iterations for collision checking/handling
 
