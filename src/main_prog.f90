@@ -15,13 +15,14 @@ program main_prog
     type(particle), allocatable :: particle_list(:)
     real, dimension(:,:), allocatable :: prev_for ! prev. forces for verlet update
     type(Timer) :: chrono
+    type(force_calc_struct) :: fcs
 
     ! Program parameters
     real, parameter :: DT  = 0.15 ! DT is an upper bound for timesteps
     real, parameter :: DT_LOWER_B = 1e-5 ! absolute lower bound for the adaptive timestep
-    character(len=*), parameter :: OUT_DIR = "timing"
+    character(len=*), parameter :: OUT_DIR = "new-fcs-rp"
     integer, parameter :: MAX_NUM_TSTEPS = 3
-    integer, parameter :: WRITE_MOD = 10
+    integer, parameter :: WRITE_MOD = 1
     real, parameter :: MAX_TIME = 100
     real, parameter :: COLLISION_RANGE = 0.05 ! check with particle radii below to see if appropriate
     integer, parameter :: BBOX_COLL_ITER = 2 ! iterations for collision checking/handling
@@ -34,6 +35,14 @@ program main_prog
     ! Pick an adaptive timestepping scheme
     logical, parameter :: USE_ATS_MAX = .false. ! use maximum particle velocity, assume uniform radius
     logical, parameter :: USE_ATS_MEAN = .true. ! use mean particle velocity and radius
+
+    ! Pick a force calculation scheme
+    logical, parameter :: USE_FCS_BRUTE = .false. ! brute force
+    logical, parameter :: USE_FCS_RADIAL_PROB = .true. ! radially constrained w/ probability of changing
+
+    ! If USE_FCS_RADIAL_PROB is true
+    real, parameter :: FCS_RADIUS = 50
+    real, parameter :: FCS_PROB = 0.1
 
     ! PROGRAM START
     print*, "SIMULATION OF RUBBLE-PILE ASTEROID COLLISION AND FORMATION WITH:"
@@ -67,6 +76,12 @@ program main_prog
     ! Write the initial state
     call write_particle_list_for_paraview(particle_list, OUT_DIR, 0)
 
+    ! Initialize the force calculation information object
+    fcs%use_brute = USE_FCS_BRUTE
+    fcs%use_radial_prob = USE_FCS_RADIAL_PROB
+    fcs%radius = FCS_RADIUS
+    fcs%prop_full = FCS_PROB
+
     total_time = 0.0 ! simulation time passed
     i = 0 ! keep track of number of timesteps passed (counts contribs from colls)
     file_counter = 1 ! for making filenames
@@ -88,12 +103,12 @@ program main_prog
 
       ! Select the appropriate integrator
       if (USE_EULER) then
-        call gravity_update_euler(particle_list, eff_dt)
+        call gravity_update_euler(particle_list, eff_dt, fcs)
       else if (USE_VERLET) then
-        call gravity_update_verlet_pos(particle_list, eff_dt, prev_for)
-        call gravity_update_verlet_vel(particle_list, eff_dt, prev_for)
+        call gravity_update_verlet_pos(particle_list, eff_dt, prev_for, fcs)
+        call gravity_update_verlet_vel(particle_list, eff_dt, prev_for, fcs)
       else
-        call gravity_update_rk4(particle_list, eff_dt)
+        call gravity_update_rk4(particle_list, eff_dt, fcs)
       end if
 
       ! Update sim time passed, # of iters

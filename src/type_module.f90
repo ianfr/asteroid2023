@@ -19,6 +19,15 @@ module type_module
         real :: collision_time = 10000000.0
     end type collision_struct
 
+    ! For selecting force calculation scheme
+    type force_calc_struct
+        logical :: use_brute = .false.
+        logical :: use_radial_prob = .false.
+        real :: radius
+        real :: prop_full ! proportion of the time to do the full force calculation
+    end type force_calc_struct
+
+
 contains
 
 ! ROUTINES FOR PARTICLES
